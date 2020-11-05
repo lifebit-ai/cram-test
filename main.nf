@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-if (param.key_file) {
+if (params.key_file) {
 
   Channel
     .fromPath(params.key_file)
@@ -21,7 +21,7 @@ if (param.key_file) {
 
 }
 
-if (param.cart_file) {
+if (params.cart_file) {
 
   Channel
   .fromPath(params.cart_file)
@@ -44,7 +44,7 @@ if (param.cart_file) {
 
 }
 
-if (param.accession) {
+if (params.accession) {
   process test_sra {
       container 'lifebitai/download_reads:latest'
       echo true
