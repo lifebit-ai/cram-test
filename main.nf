@@ -5,13 +5,13 @@ if (params.accession_file){
     .fromPath(params.accession_file)
     .splitCsv()
     .map { sample -> sample[0].trim() }
-    .into { ch_accession_id, ch_accession_id_2 }
+    .into { ch_accession_id; ch_accession_id_2 }
 }
 
 if (params.accession){
   Channel
     .value(params.accession)
-    .into { ch_accession_id, ch_accession_id_2 }
+    .into { ch_accession_id; ch_accession_id_2 }
 }
 
 if (params.key_file) {
