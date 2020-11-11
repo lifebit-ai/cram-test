@@ -1,5 +1,19 @@
 #!/usr/bin/env nextflow
 
+if (params.accession_file){
+  Channel
+    .fromPath(params.accession_file)
+    .splitCsv()
+    .map { sample -> sample[0].trim() }
+    .set { ch_accession_id }
+}
+
+if (params.accession){
+  Channel
+    .value(params.accession)
+    .set { ch_accession_id }
+}
+
 if (params.key_file) {
 
   Channel
@@ -12,10 +26,11 @@ if (params.key_file) {
 
       input:
       file(key_file) from ch_key_file
+      val(accession_id) from ch_accession_id
 
       script:
       """
-      prefetch --type $params.type --ngc $key_file --location $params.loc $params.accession
+      prefetch --type $params.type --ngc $key_file --location $params.loc $accession_id
       """
   }
 
@@ -33,25 +48,29 @@ if (params.cart_file) {
 
     input:
     file(cart_file) from ch_cart_file
+    val(accession_id) from ch_accession_id
 
     script:
-    if (!params.accession) params.accession = ""
+    if (!params.accession) accession_id = ""
     """
     vdb-config --accept-gcp-charges yes --report-cloud-identity yes
-    prefetch --perm $cart_file $params.accession
+    prefetch --perm $cart_file $accession_id
     """
   }
 
 }
 
-if (params.accession) {
+if (ch_accession_id) {
   process test_sra {
       container 'lifebitai/download_reads:latest'
       echo true
 
+      input:
+      val(accession_id) from ch_accession_id
+
       script:
       """
-      test-sra $params.accession
+      test-sra $accession_id
       """
   }
 }
