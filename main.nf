@@ -21,6 +21,7 @@ if (params.key_file) {
     .set { ch_key_file }
 
   process download_cram_ngc {
+      tag "${accession_id}"
       container 'lifebitai/download_reads:latest'
       echo true
 
@@ -43,6 +44,7 @@ if (params.cart_file) {
   .set { ch_cart_file }
 
   process download_cram_jwt {
+    tag "${accession_id}"
     container 'lifebitai/download_reads:latest'
     echo true
 
@@ -62,6 +64,7 @@ if (params.cart_file) {
 
 if (ch_accession_id) {
   process test_sra {
+      tag "${accession_id}"
       container 'lifebitai/download_reads:latest'
       echo true
 
