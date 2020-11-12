@@ -29,7 +29,7 @@ if (params.key_file) {
       echo true
 
       input:
-      file(key_file) from ch_key_file
+      each file(key_file) from ch_key_file
       val(accession_id) from ch_accession_id
 
       output:
@@ -56,14 +56,14 @@ if (params.cart_file) {
     echo true
 
     input:
-    file(cart_file) from ch_cart_file
+    each file(cart_file) from ch_cart_file
     val(accession_id) from ch_accession_id
 
     output:
     file("*")
 
     script:
-    if (!params.accession) accession_id = ""
+    if (!params.acce      file(key_file) from ch_key_filession) accession_id = ""
     """
     vdb-config --accept-gcp-charges yes --report-cloud-identity yes
     prefetch --perm $cart_file $accession_id --progress
