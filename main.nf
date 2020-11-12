@@ -15,7 +15,7 @@ if (params.accession){
 }
 
 // view all accessions from channel
-ch_accession_id.view()
+// ch_accession_id.view()
 
 if (params.key_file) {
 
