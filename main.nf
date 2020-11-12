@@ -63,7 +63,7 @@ if (params.cart_file) {
     file("*")
 
     script:
-    if (!params.acce      file(key_file) from ch_key_filession) accession_id = ""
+    if (!params.accession) accession_id = ""
     """
     vdb-config --accept-gcp-charges yes --report-cloud-identity yes
     prefetch --perm $cart_file $accession_id --progress
