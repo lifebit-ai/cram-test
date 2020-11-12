@@ -14,24 +14,31 @@ if (params.accession){
     .into { ch_accession_id; ch_accession_id_2 }
 }
 
+// view all accessions from channel
+ch_accession_id.view()
+
 if (params.key_file) {
 
   Channel
     .fromPath(params.key_file)
     .set { ch_key_file }
 
-  process download_cram_ngc {
+  process download_with_ngc {
+      publishDir "${params.outdir}/download_with_ngc", mode: 'copy'
       tag "${accession_id}"
-      container 'lifebitai/download_reads:latest'
       echo true
 
       input:
       file(key_file) from ch_key_file
       val(accession_id) from ch_accession_id
 
+      output:
+      file("*")
+
       script:
       """
-      prefetch --type $params.type --ngc $key_file --location $params.loc $accession_id
+      prefetch --type $params.type --ngc $key_file --location $params.loc $accession_id \
+        --progress
       """
   }
 
@@ -43,20 +50,23 @@ if (params.cart_file) {
   .fromPath(params.cart_file)
   .set { ch_cart_file }
 
-  process download_cram_jwt {
+  process download_with_jwt {
+    publishDir "${params.outdir}/download_with_jwt", mode: 'copy'
     tag "${accession_id}"
-    container 'lifebitai/download_reads:latest'
     echo true
 
     input:
     file(cart_file) from ch_cart_file
     val(accession_id) from ch_accession_id
 
+    output:
+    file("*")
+
     script:
     if (!params.accession) accession_id = ""
     """
     vdb-config --accept-gcp-charges yes --report-cloud-identity yes
-    prefetch --perm $cart_file $accession_id
+    prefetch --perm $cart_file $accession_id --progress
     """
   }
 
@@ -64,16 +74,18 @@ if (params.cart_file) {
 
 if (ch_accession_id) {
   process test_sra {
+      publishDir "${params.outdir}/sra_test", mode: 'copy'
       tag "${accession_id}"
-      container 'lifebitai/download_reads:latest'
-      echo true
 
       input:
       val(accession_id) from ch_accession_id_2
 
+      output:
+      file("*.xml")
+
       script:
       """
-      test-sra $accession_id
+      test-sra $accession_id > ${accession_id}.xml
       """
   }
 }
