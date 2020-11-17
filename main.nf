@@ -5,13 +5,13 @@ if (params.accession_file){
     .fromPath(params.accession_file)
     .splitCsv()
     .map { sample -> sample[0].trim() }
-    .into { ch_accession_id; ch_accession_id_2 }
+    .into { ch_accession_id; ch_accession_id_2, ch_accession_id_3 }
 }
 
 if (params.accession){
   Channel
     .value(params.accession)
-    .into { ch_accession_id; ch_accession_id_2 }
+    .into { ch_accession_id; ch_accession_id_2, ch_accession_id_3 }
 }
 
 // view all accessions from channel
@@ -21,7 +21,7 @@ if (params.key_file) {
 
   Channel
     .fromPath(params.key_file)
-    .set { ch_key_file }
+    .set { ch_key_file, ch_key_file_2 }
 
   process download_with_ngc {
       publishDir "${params.outdir}/download_with_ngc", mode: 'copy'
@@ -41,6 +41,29 @@ if (params.key_file) {
         --progress
       """
   }
+
+  process splicing-pipelines_way {
+      publishDir "${params.outdir}/splicing-pipelines_way", mode: 'copy'
+      tag "${accession_id}"
+      echo true
+
+      input:
+      each file(key_file) from ch_key_file_2
+      val(accession_id) from ch_accession_id_3
+
+      output:
+      file("*")
+
+      script:
+      def ngc_cmd_with_key_file = params.key_file ? "--ngc ${key_file}" : ''
+      """
+      prefetch $ngc_cmd_with_key_file $accession_id --progress -o $accession_id
+      fasterq-dump $ngc_cmd_with_key_file $accession_id --threads ${task.cpus} --split-3
+      pigz *.fastq
+      """
+  }
+
+  
 
 }
 
