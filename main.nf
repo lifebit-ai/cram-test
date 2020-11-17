@@ -42,8 +42,8 @@ if (params.key_file) {
       """
   }
 
-  process splicing-pipelines_way {
-      publishDir "${params.outdir}/splicing-pipelines_way", mode: 'copy'
+  process splicing_pipelines_way {
+      publishDir "${params.outdir}/splicing_pipelines_way", mode: 'copy'
       tag "${accession_id}"
       echo true
 
