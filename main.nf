@@ -5,13 +5,13 @@ if (params.accession_file){
     .fromPath(params.accession_file)
     .splitCsv()
     .map { sample -> sample[0].trim() }
-    .into { ch_accession_id; ch_accession_id_2, ch_accession_id_3 }
+    .into { ch_accession_id; ch_accession_id_2; ch_accession_id_3 }
 }
 
 if (params.accession){
   Channel
     .value(params.accession)
-    .into { ch_accession_id; ch_accession_id_2, ch_accession_id_3 }
+    .into { ch_accession_id; ch_accession_id_2; ch_accession_id_3 }
 }
 
 // view all accessions from channel
@@ -21,7 +21,7 @@ if (params.key_file) {
 
   Channel
     .fromPath(params.key_file)
-    .set { ch_key_file, ch_key_file_2 }
+    .into { ch_key_file; ch_key_file_2 }
 
   process download_with_ngc {
       publishDir "${params.outdir}/download_with_ngc", mode: 'copy'
