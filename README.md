@@ -1,4 +1,4 @@
-# CRAM test
+# datafetch
 
 This is a minimal Nextflow pipleine with diffrent methods of CRAM file download from dbGAP/GTEx.
 
