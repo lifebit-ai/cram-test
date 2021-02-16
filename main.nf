@@ -23,27 +23,7 @@ if (params.key_file) {
     .fromPath(params.key_file)
     .into { ch_key_file; ch_key_file_2 }
 
-  process download_with_ngc {
-      publishDir "${params.outdir}/download_with_ngc", mode: 'copy'
-      tag "${accession_id}"
-      echo true
-
-      input:
-      each file(key_file) from ch_key_file
-      val(accession_id) from ch_accession_id
-
-      output:
-      file("*")
-
-      script:
-      """
-      prefetch --type $params.type --ngc $key_file --location $params.loc $accession_id \
-        --progress
-      """
-  }
-
-  process splicing_pipelines_way {
-      publishDir "${params.outdir}/splicing_pipelines_way", mode: 'copy'
+  process sra_dbgap_with_ncg {
       tag "${accession_id}"
       echo true
 
@@ -62,9 +42,6 @@ if (params.key_file) {
       pigz *.fastq
       """
   }
-
-  
-
 }
 
 if (params.cart_file) {
@@ -73,8 +50,7 @@ if (params.cart_file) {
   .fromPath(params.cart_file)
   .set { ch_cart_file }
 
-  process download_with_jwt {
-    publishDir "${params.outdir}/download_with_jwt", mode: 'copy'
+  process sra_dbgap_with_jwt {
     tag "${accession_id}"
     echo true
 
@@ -97,7 +73,6 @@ if (params.cart_file) {
 
 if (ch_accession_id) {
   process test_sra {
-      publishDir "${params.outdir}/sra_test", mode: 'copy'
       tag "${accession_id}"
 
       input:
