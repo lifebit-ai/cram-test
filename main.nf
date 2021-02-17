@@ -32,7 +32,7 @@ if (params.key_file) {
       val(accession_id) from ch_accession_id_3
 
       output:
-      file("*")
+      file("${accession_id}_{1,2}.fastq.gz")
 
       script:
       def ngc_cmd_with_key_file = params.key_file ? "--ngc ${key_file}" : ''
@@ -59,13 +59,15 @@ if (params.cart_file) {
     val(accession_id) from ch_accession_id
 
     output:
-    file("*")
+    file("${accession_id}_{1,2}.fastq.gz")
 
     script:
     if (!params.accession) accession_id = ""
     """
     vdb-config --accept-gcp-charges yes --report-cloud-identity yes
     prefetch --perm $cart_file $accession_id --progress
+    fasterq-dump $accession_id --threads ${task.cpus} --split-3
+    pigz *.fastq
     """
   }
 
